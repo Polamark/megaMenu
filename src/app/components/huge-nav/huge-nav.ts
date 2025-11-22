@@ -17,6 +17,7 @@ export class HugeNav {
   constructor(cd: ChangeDetectorRef, activeRoute: ActivatedRoute, public router: Router) {
     let mediaQuery = window.matchMedia("(max-width: 1023px)")
 
+    //Handles the switching between the two nav bars
     const checkScreenWidth = (e: any) => {
       this.isMobile = e.matches;
     }
@@ -27,6 +28,7 @@ export class HugeNav {
     checkScreenWidth(mediaQuery)
 
 
+    //Handles automatic menu location changes from the url bar
     activeRoute.url.subscribe(url => {
       if (url.length === 0) return
 
@@ -450,10 +452,13 @@ export class HugeNav {
     areChildRoutesVisible: false
   }
 
+
   switchMenu(state: boolean) {
     this.menuAnimation.opened = state;
   }
 
+
+  // Automatically handles backtracking in the menu
   goBack() {
     if (this.menuAnimation.areChildRoutesVisible) {
       this.menuAnimation.areChildRoutesVisible = false;
@@ -486,6 +491,7 @@ export class HugeNav {
     this.exposedParent = parent;
   }
 
+  //Given id, returns the corresponding route
   public getRoute(parentID: number, subParentID?: number, childID?: number) {
     let data: NavRoute | undefined = this.shownRoutes.find(route => route.data.id === parentID);
     if (data && subParentID) {
@@ -497,6 +503,7 @@ export class HugeNav {
     return data;
   }
 
+  //Given URL fragments, returns the corresponding route
   public getRouteFromFragments(parentFragment: string, subParentFragment?: string, childFragment?: string) {
     let dataParent: NavRoute | undefined = this.shownRoutes.find(route => route.route === "/" + parentFragment);
     let dataSubParent: NavRoute | undefined
