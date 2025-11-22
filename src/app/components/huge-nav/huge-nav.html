@@ -37,10 +37,14 @@
       class="bg-white w-screen min-h-screen py-4 px-6 fixed top-0 left-0 transition-[translate] duration-400 ease-in-out"
       [ngClass]="{ 'translate-x-full': !menuAnimation.opened }">
       <ul class="flex flex-col gap-7">
-        <li class="text-3xl xl:text-4xl font-semibold" (click)="goBack()">Menu</li>
+        <li class="flex justify-center items-center cursor-pointer text-3xl xl:text-4xl font-semibold" (click)="goBack()"><span class="material-symbols-outlined">arrow_back_ios</span>Menu
+          <span class="ml-auto material-symbols-outlined" (click)="switchMenu(false)"
+                style="font-size: 30px">close</span>
+        </li>
         @for (parentRoute of shownRoutes; track parentRoute.data.id) {
           <li>
-            <a class="font-medium text-3xl xl:text-4xl" (click)="showParentRoutes(parentRoute)">{{ parentRoute.data.label }}</a>
+            <a class="font-medium text-3xl xl:text-4xl" [routerLink]="parentRoute.route"
+               (click)="showParentRoutes(parentRoute)">{{ parentRoute.data.label }}</a>
           </li>
         }
       </ul>
@@ -50,10 +54,14 @@
       [ngClass]="{ 'translate-x-full': !menuAnimation.areSubParentRoutesVisible || !menuAnimation.opened}">
       @if (menuLogic.parent) {
         <ul class="flex flex-col gap-7">
-          <li class="text-3xl xl:text-4xl font-semibold" (click)="goBack()"><span class="material-symbols-outlined">arrow_back_ios</span> {{menuLogic.parent.data.label}}</li>
+          <li class="flex justify-center items-center cursor-pointer text-3xl xl:text-4xl font-semibold" (click)="goBack()"><span class="material-symbols-outlined">arrow_back_ios</span> {{ menuLogic.parent.data.label }}
+            <span class="ml-auto material-symbols-outlined" (click)="switchMenu(false)"
+                  style="font-size: 30px">close</span>
+          </li>
           @for (childRoute of menuLogic.parent!.children; track childRoute.data.id) {
             <li>
-              <a class="font-medium text-3xl xl:text-4xl" (click)="showSubParentRoutes(childRoute)">{{ childRoute.data.label }}</a>
+              <a class="font-medium text-3xl xl:text-4xl" [routerLink]="childRoute.route"
+                 (click)="showSubParentRoutes(childRoute)">{{ childRoute.data.label }}</a>
             </li>
           }
         </ul>
@@ -64,7 +72,11 @@
       [ngClass]="{ 'translate-x-full': !menuAnimation.areChildRoutesVisible || !menuAnimation.opened}">
       @if (menuLogic.subParent) {
         <ul class="flex flex-col gap-7">
-          <li class="text-3xl xl:text-4xl font-semibold" (click)="goBack()"><span class="material-symbols-outlined">arrow_back_ios</span> {{menuLogic.subParent.data.label}}</li>
+          <li class="flex justify-center items-center cursor-pointer text-3xl xl:text-4xl font-semibold" (click)="goBack()"><span
+            class="material-symbols-outlined">arrow_back_ios</span> {{ menuLogic.subParent.data.label }}
+            <span class="ml-auto material-symbols-outlined" (click)="switchMenu(false)"
+                  style="font-size: 30px">close</span>
+          </li>
           @for (childRoute of menuLogic.subParent!.children; track childRoute.data.id) {
             <li>
               <a class="font-medium text-3xl xl:text-4xl" (click)="switchMenu(false)"

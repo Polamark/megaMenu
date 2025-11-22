@@ -1,5 +1,5 @@
 import {ChangeDetectorRef, Component} from '@angular/core';
-import {RouterLink} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {NgClass} from '@angular/common';
 
 @Component({
@@ -14,12 +14,33 @@ import {NgClass} from '@angular/common';
 export class HugeNav {
   isMobile = false
 
-  constructor(cd: ChangeDetectorRef) {
-    this.isMobile = window.innerWidth < 1024;
-    window.onresize = () => {
-      this.isMobile = window.innerWidth < 1024;
-      cd.detectChanges();
-    };
+  constructor(cd: ChangeDetectorRef, activeRoute: ActivatedRoute, public router: Router) {
+    let mediaQuery = window.matchMedia("(max-width: 1023px)")
+
+    const checkScreenWidth = (e: any) => {
+      this.isMobile = e.matches;
+    }
+    mediaQuery.addEventListener("change", (e) => {
+      checkScreenWidth(e)
+      cd.detectChanges()
+    })
+    checkScreenWidth(mediaQuery)
+
+
+    activeRoute.url.subscribe(url => {
+      if (url.length === 0) return
+
+      let tunnel = this.getRouteFromFragments(url[0].path, url[1]?.path, url[2]?.path)
+
+      if (tunnel[0]) {
+        this.menuLogic.parent = tunnel[0]
+        this.menuAnimation.areSubParentRoutesVisible = true
+      }
+      if (tunnel[1]) {
+        this.menuLogic.subParent = tunnel[1]
+        this.menuAnimation.areChildRoutesVisible = true
+      }
+    })
   }
 
   /*
@@ -429,15 +450,17 @@ export class HugeNav {
     areChildRoutesVisible: false
   }
 
-  switchMenu(state?: boolean) {
-    this.menuAnimation.opened = state ?? !this.menuAnimation.opened;
+  switchMenu(state: boolean) {
+    this.menuAnimation.opened = state;
   }
 
   goBack() {
     if (this.menuAnimation.areChildRoutesVisible) {
       this.menuAnimation.areChildRoutesVisible = false;
+      this.router.navigate([this.menuLogic.parent!.route])
     } else if (this.menuAnimation.areSubParentRoutesVisible) {
       this.menuAnimation.areSubParentRoutesVisible = false;
+      this.router.navigate([''])
     } else {
       this.menuAnimation.opened = false;
     }
@@ -472,6 +495,19 @@ export class HugeNav {
       data = data.children!.find(route => route.data.id === childID);
     }
     return data;
+  }
+
+  public getRouteFromFragments(parentFragment: string, subParentFragment?: string, childFragment?: string) {
+    let dataParent: NavRoute | undefined = this.shownRoutes.find(route => route.route === "/" + parentFragment);
+    let dataSubParent: NavRoute | undefined
+    let dataChild: NavRoute | undefined
+    if (dataParent && subParentFragment) {
+      dataSubParent = dataParent.children!.find(route => route.route === "/" + parentFragment + "/" + subParentFragment);
+    }
+    if (dataSubParent && childFragment) {
+      dataChild = dataSubParent.children!.find(route => route.route === "/" + parentFragment + "/" + subParentFragment + "/" + childFragment);
+    }
+    return [dataParent, dataSubParent, dataChild];
   }
 
 }
