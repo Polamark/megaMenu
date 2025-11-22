@@ -31,7 +31,7 @@ export class HugeNav {
   * Each parent and sub-parent route has a list of children routes
   *
   * */
-  shownRoutes: navRoute[] = [
+  shownRoutes: NavRoute[] = [
     /* ========================================
        1. TECHNOLOGY
     ======================================== */
@@ -412,37 +412,59 @@ export class HugeNav {
   */
 
   menuLogic: {
-    opened: boolean,
-    parent: navRoute | null,
-    subParent: navRoute | null,
+    parent: NavRoute | null,
+    subParent: NavRoute | null,
   } = {
-    opened: false,
     parent: null,
     subParent: null,
   }
 
   menuAnimation: {
-    isParentVisible: boolean,
-    isSubParentVisible: boolean,
+    opened: boolean,
+    areSubParentRoutesVisible: boolean,
+    areChildRoutesVisible: boolean
   } = {
-    isParentVisible: false,
-    isSubParentVisible: false,
+    opened: false,
+    areSubParentRoutesVisible: false,
+    areChildRoutesVisible: false
   }
 
+  switchMenu(state?: boolean) {
+    this.menuAnimation.opened = state ?? !this.menuAnimation.opened;
+  }
 
+  goBack() {
+    if (this.menuAnimation.areChildRoutesVisible) {
+      this.menuAnimation.areChildRoutesVisible = false;
+    } else if (this.menuAnimation.areSubParentRoutesVisible) {
+      this.menuAnimation.areSubParentRoutesVisible = false;
+    } else {
+      this.menuAnimation.opened = false;
+    }
+  }
+
+  showParentRoutes(route: NavRoute) {
+    this.menuAnimation.areSubParentRoutesVisible = true;
+    this.menuLogic.parent = route;
+  }
+
+  showSubParentRoutes(route: NavRoute) {
+    this.menuAnimation.areChildRoutesVisible = true;
+    this.menuLogic.subParent = route;
+  }
 
   /*
   * Larger screens code
   */
 
-  exposedParent: navRoute | null = null
+  exposedParent: NavRoute | null = null
 
-  hoverExpose(parent: navRoute | null) {
+  hoverExpose(parent: NavRoute | null) {
     this.exposedParent = parent;
   }
 
   public getRoute(parentID: number, subParentID?: number, childID?: number) {
-    let data: navRoute | undefined = this.shownRoutes.find(route => route.data.id === parentID);
+    let data: NavRoute | undefined = this.shownRoutes.find(route => route.data.id === parentID);
     if (data && subParentID) {
       data = data.children!.find(route => route.data.id === subParentID);
     }
@@ -454,8 +476,8 @@ export class HugeNav {
 
 }
 
-interface navRoute {
+interface NavRoute {
   data: { id: number, label: string },
   route: string,
-  children?: navRoute[],
+  children?: NavRoute[],
 }
