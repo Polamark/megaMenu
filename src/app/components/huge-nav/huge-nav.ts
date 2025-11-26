@@ -485,10 +485,16 @@ export class HugeNav {
   * Larger screens code
   */
 
-  exposedParent: NavRoute | null = null
+  exposedParent: NavRoute = this.shownRoutes[0]
+  menuShown = false;
 
   hoverExpose(parent: NavRoute | null) {
-    this.exposedParent = parent;
+    if (parent) {
+      this.exposedParent = parent;
+      this.menuShown = true;
+    } else {
+      this.menuShown = false;
+    }
   }
 
   //Given id, returns the corresponding route
